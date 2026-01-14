@@ -1,358 +1,304 @@
 import { z } from "zod";
 
 /**
- * Ready24 — Content Types & Schemas (Day-0 Source of Truth)
+ * Ready24 — Content Types + Zod Schemas
+ * Source of Truth: Day-0 Data Pack (Excel)
  *
- * هذا الملف هو الأساس: كل ملفات src/content/*.ts ستعتمد عليه.
- * صُمم ليطابق أعمدة قالب Day-0 Data Template v3 (Sheets).
+ * ملاحظة:
+ * - نخلي التحقق مفيد بدون ما يكون خانق.
+ * - القيم المقفولة (SLA + deposit_rule) نخليها strict.
  */
 
-/* ---------------------------------- */
-/* Shared enums & helpers             */
-/* ---------------------------------- */
+/* ------------------------------ */
+/* Shared helpers                  */
+/* ------------------------------ */
 
-export const TRACKS = ["jobs", "students", "business", "web"] as const;
-export type Track = (typeof TRACKS)[number];
+const NonEmptyString = z.string().trim().min(1);
+const OptionalString = z.string().trim().optional().default("");
 
-export const SLA_TIERS = ["Express", "Short", "Medium", "Large"] as const;
-export type SlaTier = (typeof SLA_TIERS)[number];
+const YesNoSchema = z.enum(["yes", "no"]);
+export type YesNo = z.infer<typeof YesNoSchema>;
 
-export const DEPOSIT_RULES = ["50/50", "100%"] as const;
-export type DepositRule = (typeof DEPOSIT_RULES)[number];
+const SlaTierSchema = z.enum(["Express", "Short", "Medium", "Large"]);
+export type SlaTier = z.infer<typeof SlaTierSchema>;
 
-export const YES_NO = ["yes", "no"] as const;
-export type YesNo = (typeof YES_NO)[number];
+const DepositRuleSchema = z.enum(["50/50", "100%"]);
+export type DepositRule = z.infer<typeof DepositRuleSchema>;
 
-export const ACTIVE_INACTIVE = ["active", "inactive"] as const;
-export type ActiveStatus = (typeof ACTIVE_INACTIVE)[number];
-
-export const PUBLISHED = ["yes", "no"] as const;
-export type Published = (typeof PUBLISHED)[number];
-
-export const COMMISSION_TYPES = ["percent", "fixed"] as const;
-export type CommissionType = (typeof COMMISSION_TYPES)[number];
-
-export const WEB_PACKAGE_CODES = ["A", "B", "C"] as const;
-export type WebPackageCode = (typeof WEB_PACKAGE_CODES)[number];
-
-export const MEDIA_TYPES = ["webp", "pdf", "youtube"] as const;
-export type MediaType = (typeof MEDIA_TYPES)[number];
-
-const nonEmpty = z.string().trim().min(1, "هذا الحقل مطلوب (غير فارغ).");
-
-const slug = z
+const SlugSchema = z
   .string()
   .trim()
   .min(1)
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug يجب أن يكون lowercase وبـ - فقط.");
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case (a-z0-9-)");
 
-const pathLike = z
-  .string()
-  .trim()
-  .min(1)
-  .refine(
-    (v) => v.startsWith("/") && !v.startsWith("//") && !v.includes(" "),
-    "Path يجب أن يبدأ بـ / ولا يحتوي مسافات.",
-  );
-
-const urlOrPath = z
-  .string()
-  .trim()
-  .min(1)
-  .refine(
-    (v) => v.startsWith("/") || /^https?:\/\//i.test(v),
-    "يجب أن يكون رابطًا (http/https) أو مسارًا يبدأ بـ /",
-  );
-
-const optionalTrimmed = z
-  .union([z.string(), z.null(), z.undefined()])
-  .transform((v) => (typeof v === "string" ? v.trim() : undefined))
-  .refine((v) => v === undefined || v.length > 0, "لا تترك نصًا مكوّنًا من مسافات فقط.");
-
-const yesNoSchema = z.enum(YES_NO);
-const publishedSchema = z.enum(PUBLISHED);
-const activeInactiveSchema = z.enum(ACTIVE_INACTIVE);
-const trackSchema = z.enum(TRACKS);
-const slaTierSchema = z.enum(SLA_TIERS);
-const depositRuleSchema = z.enum(DEPOSIT_RULES);
-const mediaTypeSchema = z.enum(MEDIA_TYPES);
-const webPackageCodeSchema = z.enum(WEB_PACKAGE_CODES);
-
-const commaTagsSchema = z.union([z.string(), z.array(z.string())]).transform((v) => {
-  const raw = Array.isArray(v) ? v.join(",") : v;
-  const tags = raw
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
-  // 0-3 tags حسب القالب
-  return tags.slice(0, 3);
-});
-
-/* ---------------------------------- */
-/* Sheet: SiteConfig                   */
-/* key, value, notes_ar                */
-/* ---------------------------------- */
+/* ------------------------------ */
+/* Site Config                     */
+/* ------------------------------ */
 
 export const SiteConfigEntrySchema = z.object({
-  key: nonEmpty,
-  value: optionalTrimmed,
-  notes_ar: optionalTrimmed,
+  key: NonEmptyString,
+  value: z.string().trim().default(""),
+  notes_ar: OptionalString,
 });
 export type SiteConfigEntry = z.infer<typeof SiteConfigEntrySchema>;
 
-/* ---------------------------------- */
-/* Sheet: Services                     */
-/* ---------------------------------- */
+export const SiteConfigSchema = z.array(SiteConfigEntrySchema);
+
+/* ------------------------------ */
+/* Services                        */
+/* ------------------------------ */
 
 export const ServiceSchema = z.object({
-  id: nonEmpty,
-  slug,
-  track: trackSchema,
-  name_ar: nonEmpty,
-  short_desc_ar: nonEmpty,
-  deliverables_ar: nonEmpty, // نص (3-5 نقاط) — نخليه نص الآن ونفصله لاحقًا عند العرض
-  inputs_ar: nonEmpty, // نص (مدخلات العميل)
-  revisions_included: z.coerce.number().int().min(0),
-  sla_tier: slaTierSchema,
-  express_eligible: yesNoSchema,
-  express_conditions_ar: optionalTrimmed,
-  service_status: activeInactiveSchema,
-  notes_ar: optionalTrimmed,
+  id: NonEmptyString,
+  slug: SlugSchema,
+
+  track: NonEmptyString,
+
+  name_ar: NonEmptyString,
+  short_desc_ar: OptionalString,
+
+  deliverables_ar: OptionalString,
+  inputs_ar: OptionalString,
+
+  revisions_included: z.number().int().min(0).default(0),
+
+  sla_tier: SlaTierSchema,
+
+  express_eligible: YesNoSchema.default("no"),
+  express_conditions_ar: OptionalString,
+
+  service_status: z.enum(["active", "inactive", "draft"]).default("active"),
+  notes_ar: OptionalString,
 });
 export type Service = z.infer<typeof ServiceSchema>;
 
-/* ---------------------------------- */
-/* Sheet: Pricing                      */
-/* ---------------------------------- */
+export const ServicesSchema = z.array(ServiceSchema);
+
+/* ------------------------------ */
+/* Pricing                         */
+/* ------------------------------ */
 
 export const PricingSchema = z.object({
-  service_slug: slug,
-  price_min_sdg: z.coerce.number().int().min(0),
-  price_max_sdg: z.coerce.number().int().min(0),
-  pricing_note_ar: nonEmpty,
-  deposit_rule: depositRuleSchema, // 50/50 or 100%
-  what_included_ar: nonEmpty,
-  what_not_included_ar: optionalTrimmed,
+  service_slug: SlugSchema,
+
+  price_min_sdg: z.number().int().min(0),
+  price_max_sdg: z.number().int().min(0),
+
+  pricing_note_ar: OptionalString,
+
+  deposit_rule: DepositRuleSchema,
+  what_included_ar: OptionalString,
+  what_not_included_ar: OptionalString,
 });
 export type Pricing = z.infer<typeof PricingSchema>;
 
-/* ---------------------------------- */
-/* Sheet: WebPackages                  */
-/* ---------------------------------- */
+export const PricingListSchema = z.array(PricingSchema);
+
+/* ------------------------------ */
+/* Web Packages                    */
+/* ------------------------------ */
 
 export const WebPackageSchema = z.object({
-  package_code: webPackageCodeSchema,
-  title_ar: nonEmpty,
-  short_desc_ar: nonEmpty,
-  price_min_sdg: z.coerce.number().int().min(0),
-  price_max_sdg: z.coerce.number().int().min(0),
-  sla_tier: slaTierSchema,
-  deliverables_ar: nonEmpty,
-  inputs_ar: nonEmpty,
-  revisions_included: z.coerce.number().int().min(0),
-  deposit_rule: depositRuleSchema,
-  notes_ar: optionalTrimmed,
+  package_code: z.string().trim().min(1).max(10),
+  title_ar: NonEmptyString,
+  short_desc_ar: OptionalString,
+
+  price_min_sdg: z.number().int().min(0),
+  price_max_sdg: z.number().int().min(0),
+
+  sla_tier: SlaTierSchema,
+  deliverables_ar: OptionalString,
+  inputs_ar: OptionalString,
+
+  revisions_included: z.number().int().min(0).default(0),
+  deposit_rule: DepositRuleSchema,
+
+  notes_ar: OptionalString,
 });
 export type WebPackage = z.infer<typeof WebPackageSchema>;
 
-/* ---------------------------------- */
-/* Sheet: Work                         */
-/* (row per media item)                */
-/* ---------------------------------- */
+export const WebPackagesSchema = z.array(WebPackageSchema);
 
-export const WorkRowSchema = z
-  .object({
-    case_slug: slug,
-    track: trackSchema,
-    title_ar: nonEmpty,
-    summary_ar: nonEmpty, // 3-5 أسطر
-    service_slug: optionalTrimmed, // CTA
-    media_type: mediaTypeSchema,
-    media_order: z.coerce.number().int().min(0),
-    media_path_or_url: urlOrPath,
-    media_alt_ar: optionalTrimmed, // required for images, optional for pdf/youtube
-    privacy_status: z.literal("confirmed"),
-    privacy_note_ar: optionalTrimmed,
-    published: publishedSchema,
-    notes_ar: optionalTrimmed,
-  })
-  .superRefine((row, ctx) => {
-    if (
-      row.media_type === "webp" &&
-      (!row.media_alt_ar || row.media_alt_ar.length === 0)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["media_alt_ar"],
-        message: "للصور (webp) يجب توفير alt بالعربي.",
-      });
-    }
-    if (row.published === "yes" && row.privacy_status !== "confirmed") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["privacy_status"],
-        message: "أي عنصر منشور يجب أن يكون privacy_status = confirmed.",
-      });
-    }
-  });
+/* ------------------------------ */
+/* Work / Portfolio                */
+/* ------------------------------ */
 
-export type WorkRow = z.infer<typeof WorkRowSchema>;
-
-/* ---------------------------------- */
-/* Sheet: ResourceCategories           */
-/* ---------------------------------- */
-
-export const ResourceCategorySchema = z.object({
-  category: nonEmpty, // ثابت
-  order: z.coerce.number().int().min(0),
-  notes_ar: optionalTrimmed,
+export const WorkMediaSchema = z.object({
+  media_type: z.enum(["image", "video", "youtube"]).default("image"),
+  media_path_or_url: NonEmptyString,
+  alt_ar: OptionalString,
+  media_order: z.number().int().min(0).default(0),
 });
-export type ResourceCategory = z.infer<typeof ResourceCategorySchema>;
+export type WorkMedia = z.infer<typeof WorkMediaSchema>;
 
-/* ---------------------------------- */
-/* Sheet: Resources                    */
-/* ---------------------------------- */
+export const WorkItemSchema = z.object({
+  case_slug: SlugSchema,
+  title_ar: NonEmptyString,
+  summary_ar: OptionalString,
+
+  service_slug: SlugSchema.optional().or(z.literal("")).default(""),
+
+  privacy_status: z.enum(["public", "blurred", "hidden"]).default("public"),
+
+  media: z.array(WorkMediaSchema).default([]),
+
+  published: YesNoSchema.default("no"),
+});
+export type WorkItem = z.infer<typeof WorkItemSchema>;
+
+// ✅ هذا هو الـexport الذي كان ناقصًا ويسبب الخطأ
+export const PortfolioItemsSchema = z.array(WorkItemSchema);
+
+/* ------------------------------ */
+/* Resources                       */
+/* ------------------------------ */
 
 export const ResourceSchema = z.object({
-  id: slug, // slug ثابت
-  category: nonEmpty, // ثابت (يرتبط بـ ResourceCategories)
-  ar_name: nonEmpty,
-  en_name: optionalTrimmed,
-  url: z.string().trim().min(1), // بعض الروابط قد لا تمر url() بسبب أحرف خاصة — نتحقق لاحقًا
-  ar_summary: nonEmpty,
-  tags: commaTagsSchema, // 0-3
-  risk_note_ar: optionalTrimmed,
-  related_service_slug: optionalTrimmed,
-  published: publishedSchema,
+  id: NonEmptyString,
+  category: NonEmptyString,
+
+  ar_name: NonEmptyString,
+  en_name: OptionalString,
+
+  url: z.string().trim().url(),
+  ar_summary: OptionalString,
+
+  tags: OptionalString,
+  risk_note_ar: OptionalString,
+
+  related_service_slug: SlugSchema.optional().or(z.literal("")).default(""),
+
+  published: YesNoSchema.default("yes"),
 });
 export type Resource = z.infer<typeof ResourceSchema>;
 
-/* ---------------------------------- */
-/* Sheet: Ambassadors                  */
-/* ---------------------------------- */
+export const ResourcesSchema = z.array(ResourceSchema);
+
+/* ------------------------------ */
+/* Resource Categories             */
+/* ------------------------------ */
+
+export const ResourceCategorySchema = z.object({
+  category: NonEmptyString,
+  order: z.number().int().min(0).default(0),
+  notes_ar: OptionalString,
+});
+export type ResourceCategory = z.infer<typeof ResourceCategorySchema>;
+
+export const ResourceCategoriesSchema = z.array(ResourceCategorySchema);
+
+/* ------------------------------ */
+/* Ambassadors                     */
+/* ------------------------------ */
 
 export const AmbassadorSchema = z.object({
-  code: nonEmpty, // referral code
-  display_name_ar: nonEmpty,
-  name_variants_ar: optionalTrimmed,
-  city: nonEmpty,
-  country: nonEmpty,
-  profile_image_path: urlOrPath, // غالبًا /media/ambassadors/xxx.webp
-  whatsapp: optionalTrimmed,
-  facebook: optionalTrimmed,
-  linkedin: optionalTrimmed,
-  status: activeInactiveSchema,
-  consent_confirmed: z.literal("yes"),
-  notes_ar: optionalTrimmed,
+  code: NonEmptyString,
+
+  display_name_ar: NonEmptyString,
+  name_variants_ar: OptionalString,
+
+  city: OptionalString,
+  country: OptionalString,
+
+  profile_image_path: OptionalString,
+
+  whatsapp: z
+    .string()
+    .trim()
+    .regex(/^\d{6,20}$/, "whatsapp must be digits only (no +, no spaces)")
+    .optional()
+    .default(""),
+
+  facebook: z.string().trim().url().or(z.literal("")).optional().default(""),
+  linkedin: z.string().trim().url().or(z.literal("")).optional().default(""),
+
+  status: z.enum(["active", "inactive"]).default("active"),
+  consent_confirmed: YesNoSchema.default("no"),
+
+  notes_ar: OptionalString,
 });
 export type Ambassador = z.infer<typeof AmbassadorSchema>;
 
-/* ---------------------------------- */
-/* Sheet: Commissions_v1               */
-/* ---------------------------------- */
+export const AmbassadorsSchema = z.array(AmbassadorSchema);
+
+/* ------------------------------ */
+/* Commissions v1                  */
+/* ------------------------------ */
 
 export const CommissionRuleSchema = z.object({
-  track: trackSchema,
-  commission_type: z.enum(COMMISSION_TYPES),
-  commission_value: z.coerce.number().min(0),
-  web_package_code: z
-    .union([webPackageCodeSchema, z.literal(""), z.null(), z.undefined()])
-    .transform((v) => (v ? v : undefined)),
-  notes_ar: optionalTrimmed,
-  active: z.enum(YES_NO),
+  track: NonEmptyString,
+
+  commission_type: z.enum(["percent", "fixed"]),
+  commission_value: z.number().min(0),
+
+  web_package_code: OptionalString,
+  notes_ar: OptionalString,
+
+  active: YesNoSchema.default("yes"),
 });
 export type CommissionRule = z.infer<typeof CommissionRuleSchema>;
 
-/* ---------------------------------- */
-/* Sheet: FAQ                          */
-/* ---------------------------------- */
+export const CommissionsSchema = z.array(CommissionRuleSchema);
+
+/* ------------------------------ */
+/* FAQ                             */
+/* ------------------------------ */
 
 export const FaqSchema = z.object({
-  id: slug, // slug ثابت
-  category: nonEmpty,
-  q_ar: nonEmpty,
-  a_ar: nonEmpty,
-  published: publishedSchema,
+  id: NonEmptyString,
+  category: NonEmptyString,
+  q_ar: NonEmptyString,
+  a_ar: NonEmptyString,
+  published: YesNoSchema.default("yes"),
 });
 export type Faq = z.infer<typeof FaqSchema>;
 
-/* ---------------------------------- */
-/* Sheet: PolicySnippets               */
-/* ---------------------------------- */
+export const FaqsSchema = z.array(FaqSchema);
+
+/* ------------------------------ */
+/* Policy Snippets                 */
+/* ------------------------------ */
 
 export const PolicySnippetSchema = z.object({
-  key: nonEmpty,
-  text_ar: nonEmpty,
-  where_used: optionalTrimmed,
+  key: NonEmptyString,
+  text_ar: NonEmptyString,
+  where_used: OptionalString,
 });
 export type PolicySnippet = z.infer<typeof PolicySnippetSchema>;
 
-/* ---------------------------------- */
-/* Sheet: SEO                          */
-/* ---------------------------------- */
+export const PolicySnippetsSchema = z.array(PolicySnippetSchema);
 
-export const SeoEntrySchema = z.object({
-  path: pathLike,
-  title_ar: nonEmpty,
-  description_ar: nonEmpty,
-  og_title_ar: optionalTrimmed,
-  og_description_ar: optionalTrimmed,
-  og_image_path: optionalTrimmed, // مسار داخل public أو رابط
-});
-export type SeoEntry = z.infer<typeof SeoEntrySchema>;
-
-/* ---------------------------------- */
-/* Sheet: Redirects                    */
-/* ---------------------------------- */
+/* ------------------------------ */
+/* Redirects                       */
+/* ------------------------------ */
 
 export const RedirectSchema = z.object({
-  from_path: pathLike,
-  to_path: pathLike,
-  status_code: z.coerce
-    .number()
-    .int()
-    .refine((n) => n === 301 || n === 308, {
-      message: "status_code يجب أن يكون 301 أو 308 فقط.",
-    }),
-  notes_ar: optionalTrimmed,
+  from_path: z.string().trim().min(1),
+  to_path: z.string().trim().min(1),
+  status_code: z.union([z.literal(301), z.literal(302), z.literal(307), z.literal(308)]),
+  notes_ar: OptionalString,
 });
 export type Redirect = z.infer<typeof RedirectSchema>;
 
-/* ---------------------------------- */
-/* Collections Schemas (arrays)        */
-/* ---------------------------------- */
-
-export const SiteConfigSchema = z.array(SiteConfigEntrySchema);
-export const ServicesSchema = z.array(ServiceSchema);
-export const PricingListSchema = z.array(PricingSchema);
-export const WebPackagesSchema = z.array(WebPackageSchema);
-export const WorkSchema = z.array(WorkRowSchema);
-export const ResourceCategoriesSchema = z.array(ResourceCategorySchema);
-export const ResourcesSchema = z.array(ResourceSchema);
-export const AmbassadorsSchema = z.array(AmbassadorSchema);
-export const CommissionsSchema = z.array(CommissionRuleSchema);
-export const FaqsSchema = z.array(FaqSchema);
-export const PolicySnippetsSchema = z.array(PolicySnippetSchema);
-export const SeoSchema = z.array(SeoEntrySchema);
 export const RedirectsSchema = z.array(RedirectSchema);
 
-/* ---------------------------------- */
-/* Day-0 bundle type (optional use)    */
-/* ---------------------------------- */
+/* ------------------------------ */
+/* SEO Map + OpenGraph             */
+/* ------------------------------ */
 
-export const Day0BundleSchema = z.object({
-  siteConfig: SiteConfigSchema,
-  services: ServicesSchema,
-  pricing: PricingListSchema,
-  webPackages: WebPackagesSchema,
-  work: WorkSchema,
-  resourceCategories: ResourceCategoriesSchema,
-  resources: ResourcesSchema,
-  ambassadors: AmbassadorsSchema,
-  commissionsV1: CommissionsSchema,
-  faq: FaqsSchema,
-  policySnippets: PolicySnippetsSchema,
-  seo: SeoSchema,
-  redirects: RedirectsSchema,
+export const SeoEntrySchema = z.object({
+  path: z.string().trim().min(1),
+  title_ar: NonEmptyString,
+  description_ar: OptionalString,
+
+  canonical: z.string().trim().min(1).default("/"),
+
+  og_title_ar: OptionalString,
+  og_description_ar: OptionalString,
+  og_image_path: OptionalString,
+
+  robots: z.string().trim().optional().default("index,follow"),
 });
-export type Day0Bundle = z.infer<typeof Day0BundleSchema>;
+export type SeoEntry = z.infer<typeof SeoEntrySchema>;
+
+export const SeoEntriesSchema = z.array(SeoEntrySchema);
