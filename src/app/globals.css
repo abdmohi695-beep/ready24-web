@@ -1,26 +1,122 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* ------------------------------
+   Ready24 Design Tokens (CSS Vars)
+   ------------------------------ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Colors (neutral, Sudan-inspired warmth but subtle) */
+  --bg: 0 0% 100%;
+  --fg: 224 25% 14%;
+
+  --muted: 220 14% 96%;
+  --muted-fg: 220 10% 40%;
+
+  --card: 0 0% 100%;
+  --card-fg: 224 25% 14%;
+
+  --border: 220 14% 90%;
+  --ring: 215 90% 55%;
+
+  /* Brand accent (keep subtle; can be tuned later) */
+  --primary: 22 90% 55%;
+  --primary-fg: 0 0% 100%;
+
+  /* Radius */
+  --radius: 16px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Dark mode (optional now, safe later) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: 224 25% 10%;
+    --fg: 0 0% 98%;
+    --muted: 224 18% 16%;
+    --muted-fg: 220 12% 70%;
+    --card: 224 22% 12%;
+    --card-fg: 0 0% 98%;
+    --border: 224 18% 22%;
+    --ring: 215 90% 60%;
+    --primary: 22 90% 58%;
+    --primary-fg: 0 0% 100%;
   }
 }
 
+/* ------------------------------
+   Base styles
+   ------------------------------ */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: hsl(var(--bg));
+  color: hsl(var(--fg));
+  text-rendering: optimizeLegibility;
+}
+
+/* RTL safety */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+/* Better focus for accessibility */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ------------------------------
+   Cut-paper + subtle pattern background
+   (خفيف جدًا، بدون صور خارجية)
+   ------------------------------ */
+.r24-surface {
+  position: relative;
+  background: hsl(var(--bg));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.r24-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+
+  /* light Sudan-inspired geometric texture */
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(0, 0, 0, 0.03) 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 30%, rgba(0, 0, 0, 0.025) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 80%, rgba(0, 0, 0, 0.02) 0 2px, transparent 3px);
+  background-size: 180px 180px;
+  background-position: 0 0;
+  opacity: 0.9;
+}
+
+/* Reduced motion respect (global safety) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
