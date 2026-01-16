@@ -39,3 +39,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# backups created by scripts (keep them out of git)
+*.bak.*
