@@ -1,17 +1,49 @@
-import { SiteConfigSchema, type SiteConfigEntry } from "./types";
+﻿import { SiteConfigSchema, type SiteConfigEntry } from "./types";
 
 /**
- * Ready24 — Site Config (Day-0)
- * المصدر: Sheet "SiteConfig" في قالب Day-0.
- *
- * ملاحظة: نبدأ بمصفوفة فاضية عشان المشروع يشتغل بدون ما يفرض افتراضات،
- * وبعدين نملأها من القالب مباشرة.
+ * Ready24  Site Config (Day-0)
+ * المصدر: Sheet "SiteConfig" في قالب Day-0
  */
-
 const RAW_SITE_CONFIG: SiteConfigEntry[] = [
-  // مثال (انسخه وعدّل عليه لاحقًا):
-  // { key: "site_name_ar", value: "Ready24", notes_ar: "اسم الموقع بالعربية" },
-  // { key: "whatsapp_main", value: "249115646893", notes_ar: "رقم واتساب الرئيسي بدون +" },
+  { key: "site_url", value: "https://ready24.org", notes_ar: "الرابط الرسمي" },
+
+  { key: "brand_name_ar", value: "Ready24", notes_ar: "اسم العلامة" },
+  {
+    key: "brand_tagline_ar",
+    value: "Opportunity | Organized | Fast",
+    notes_ar: "شعار مختصر",
+  },
+
+  { key: "whatsapp_number", value: "249115646893", notes_ar: "رقم واتساب بدون +" },
+
+  {
+    key: "facebook_url",
+    value: "https://web.facebook.com/ready24platform",
+    notes_ar: "رابط فيسبوك",
+  },
+  {
+    key: "linkedin_url",
+    value: "https://www.linkedin.com/company/ready24platform/",
+    notes_ar: "رابط لينكدإن",
+  },
+
+  {
+    key: "default_seo_title_ar",
+    value: "Ready24  خدمات احترافية سريعة بدون لخبطة",
+    notes_ar: "عنوان SEO افتراضي",
+  },
+  {
+    key: "default_seo_description_ar",
+    value:
+      "بنجهّز ليك مستندات، محتوى، وترتيب شغل بطريقة منظمة وواضحة  وتسليم سريع حسب الخدمة.",
+    notes_ar: "وصف SEO افتراضي",
+  },
+
+  {
+    key: "default_og_image_path",
+    value: "/brand/og-default.webp",
+    notes_ar: "صورة OG افتراضية",
+  },
 ];
 
 export const SITE_CONFIG = SiteConfigSchema.parse(RAW_SITE_CONFIG);
