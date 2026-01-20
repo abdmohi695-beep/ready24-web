@@ -1,147 +1,246 @@
-﻿// src/app/(site)/faq/page.tsx
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "الأسئلة الشائعة | Ready24",
   description:
-    "إجابات واضحة عن طريقة الطلب، تحديد السعر، الدفع، زمن التسليم، التعديلات، والخصوصية في Ready24.",
+    "إجابات واضحة ومباشرة عن الطلب، الأسعار، زمن التسليم، المراجعات، والخصوصية في Ready24.",
 };
 
 type FaqItem = {
   q: string;
-  a: string;
+  a: React.ReactNode;
 };
 
 const FAQ: FaqItem[] = [
   {
-    q: "كيف أقدّم طلباً في Ready24؟",
-    a: "اذهب إلى صفحة «طلب خدمة»، اختر الخدمة المناسبة، واكتب تفاصيل طلبك بوضوح. بعد ذلك نراجع المدخلات ونؤكد لك نطاق السعر وخطة التنفيذ قبل البدء.",
+    q: "كيف أطلب خدمة من Ready24؟",
+    a: (
+      <>
+        <p className="text-sm leading-7 text-neutral-700">
+          ببساطة: اختر الخدمة، أرسل الملفات أو التفاصيل، ثم نؤكد لك السعر وخطة التنفيذ
+          وزمن التسليم قبل أن نبدأ. بعد ذلك ننفذ العمل ونرسل لك نسخة أولى للمراجعة حسب ما
+          هو موضح في الخدمة.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href="/services"
+            className="inline-flex items-center rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50"
+          >
+            اذهب إلى الخدمات
+          </Link>
+          <Link
+            href="/order"
+            className="inline-flex items-center rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+          >
+            ابدأ الطلب الآن
+          </Link>
+        </div>
+      </>
+    ),
   },
   {
-    q: "كيف يتم تحديد السعر؟ ولماذا يظهر كنطاق؟",
-    a: "السعر يُعرض كنطاق لأن التفاصيل تختلف من عميل لآخر. بعد مراجعة الطلب (الحجم، التعقيد، عدد المخرجات، ودرجة الاستعجال) نثبت لك السعر النهائي كتابياً قبل التنفيذ.",
+    q: "كيف تحددون الأسعار؟ ولماذا أحياناً يتغير السعر داخل النطاق؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        الأسعار المعروضة هي نطاقات إرشادية، لأن السعر النهائي يعتمد على حجم العمل، جودة
+        الملفات، مستوى التعقيد، والوقت المطلوب للتسليم. قبل التنفيذ نثبت لك السعر بوضوح،
+        ولا نبدأ إلا بعد موافقتك.
+      </p>
+    ),
   },
   {
-    q: "هل يوجد عربون قبل البدء؟",
-    a: "نعم في أغلب الخدمات يبدأ التنفيذ بعد دفع العربون حسب سياسة الخدمة. بعض الطلبات السريعة جداً أو الصغيرة قد تتطلب الدفع كاملاً مقدماً.",
+    q: "ما المقصود بزمن التسليم (Express / Short / Medium / Large)؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        هذه مستويات زمنية لتنظيم التسليم حسب نوع الخدمة والضغط الحالي. بعض الخدمات قد تكون
+        متاحة للتسليم العاجل (Express) بشروط، وسنوضح لك ذلك أثناء تأكيد الطلب.
+      </p>
+    ),
   },
   {
-    q: "ما سياسة التعديلات؟",
-    a: "لكل خدمة عدد تعديلات مشمول يوضح داخل وصف الخدمة. التعديلات المقصودة هي تحسينات على نفس الاتجاه المتفق عليه، لا تغيير كامل للفكرة بعد التنفيذ.",
+    q: "هل يوجد عربون أو دفع كامل قبل البدء؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        نعم، بحسب نوع الخدمة تكون القاعدة إما دفع كامل مقدماً أو تقسيم الدفع (مثل 50/50).
+        ستصل لك القاعدة بشكل واضح عند تأكيد الطلب، مع توضيح ما الذي ستستلمه ومتى.
+      </p>
+    ),
   },
   {
-    q: "ما المقصود بزمن التسليم (SLA)؟",
-    a: "هو معيار يحدد سرعة التنفيذ حسب فئة الخدمة. بعض الخدمات لها تسليم سريع، بينما خدمات أخرى تحتاج وقتاً أطول لضمان الجودة والمراجعة.",
+    q: "كم عدد المراجعات المتاحة بعد التسليم؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        يختلف ذلك حسب الخدمة. ستجد عدد المراجعات ضمن وصف الخدمة، ونلتزم به كما هو. وإذا
+        احتجت تعديلات إضافية خارج نطاق المراجعات المتفق عليها، ننسق معك بشكل واضح قبل أي
+        عمل إضافي.
+      </p>
+    ),
   },
   {
-    q: "ما الذي أحتاج لتسليمه لكم قبل بدء التنفيذ؟",
-    a: "المدخلات تختلف حسب الخدمة، لكن القاعدة العامة: ملفك الحالي أو محتواك الخام، الهدف أو الاستخدام النهائي، وأي ملاحظات أو أمثلة تحب أن نلتزم بها. كلما كانت المدخلات أدق كانت النتيجة أفضل.",
+    q: "هل تعدّلون الملفات الحالية أم تكتبون من الصفر؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        حسب الخدمة وحسب ما ترسله لنا. أحياناً يكون المطلوب تحسين نسخة موجودة (مثل CV أو
+        بروفايل)، وأحياناً نكتب من الصفر إذا كانت هذه هي الخدمة المطلوبة. المهم أن تكون
+        النتيجة نهائية ومنظمة وقابلة للاستخدام فوراً.
+      </p>
+    ),
   },
   {
-    q: "هل تضمنون السرية والخصوصية؟",
-    a: "نعم. لا ننشر أي مثال من أعمال العملاء إلا بموافقة صريحة. وإذا كان الطلب حساساً يمكن تنفيذ العمل دون حفظ أي نسخ خارج إطار التنفيذ.",
+    q: "هل تضمنون القبول في وظيفة أو منحة؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        لا توجد جهة محترفة تضمن قبولاً لأن القرار النهائي عند جهة التوظيف أو الجهة
+        المانحة. لكننا نضمن لك عملاً قوياً وواضحاً ومحسناً من حيث الصياغة والبناء والمنطق،
+        بحيث يقدمك بأفضل صورة ممكنة.
+      </p>
+    ),
   },
   {
-    q: "كيف أتواصل معكم بسرعة؟",
-    a: "أفضل قناة هي واتساب، ويمكنك أيضاً التواصل عبر فيسبوك أو لينكدإن. ستجد كل الروابط الرسمية داخل صفحة «تواصل معنا».",
+    q: "كيف تتعاملون مع خصوصية الملفات والمعلومات؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        نتعامل مع ملفاتك كبيانات خاصة. لا ننشر أي محتوى أو أمثلة “قبل وبعد” إلا بموافقة
+        صريحة منك. وإذا كان العمل حساساً، نلتزم بإخفاء الأسماء والبيانات التعريفية تماماً
+        عند الحاجة.
+      </p>
+    ),
+  },
+  {
+    q: "هل لديكم خدمات للمواقع الإلكترونية؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        نعم، لدينا باقات وخيارات للمواقع حسب الهدف (موقع تعريفي، صفحة هبوط، موقع خدمات…).
+        ستجد التفاصيل ضمن صفحات الخدمات والأسعار، ويمكننا توجيهك لأفضل خيار حسب احتياجك.
+      </p>
+    ),
+  },
+  {
+    q: "ما هو برنامج السفراء؟ وكيف تعمل العمولة؟",
+    a: (
+      <p className="text-sm leading-7 text-neutral-700">
+        برنامج السفراء يسمح لك بمشاركة كود خاص بك. عندما يستخدمه شخص آخر في طلب خدمة،
+        تُسجل لك عمولة وفق القواعد المعلنة. كل التفاصيل موجودة في صفحة السفراء.
+      </p>
+    ),
+  },
+  {
+    q: "ما طرق التواصل الرسمية؟",
+    a: (
+      <>
+        <p className="text-sm leading-7 text-neutral-700">
+          التواصل الأساسي يكون عبر واتساب، ويمكنك كذلك استخدام الروابط الرسمية لفيسبوك
+          ولينكدإن. ستجد كل الروابط في صفحة “تواصل معنا”.
+        </p>
+        <div className="mt-3">
+          <Link
+            href="/contact"
+            className="inline-flex items-center rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50"
+          >
+            اذهب إلى تواصل معنا
+          </Link>
+        </div>
+      </>
+    ),
   },
 ];
 
-function SectionTitle({ title, desc }: { title: string; desc?: string }) {
+function FaqItemCard({
+  item,
+  defaultOpen = false,
+}: {
+  item: FaqItem;
+  defaultOpen?: boolean;
+}) {
   return (
-    <div className="space-y-2">
-      <h1 className="text-3xl font-semibold leading-snug">{title}</h1>
-      {desc ? <p className="text-sm text-neutral-700">{desc}</p> : null}
-    </div>
+    <details
+      className="group rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
+      open={defaultOpen}
+    >
+      <summary className="cursor-pointer list-none select-none">
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="text-base font-semibold leading-7 text-neutral-900">{item.q}</h3>
+          <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 text-neutral-700 transition-transform group-open:rotate-45">
+            +
+          </span>
+        </div>
+        <p className="mt-2 text-sm text-neutral-500">اضغط لعرض الإجابة</p>
+      </summary>
+
+      <div className="mt-4 border-t border-neutral-100 pt-4">{item.a}</div>
+    </details>
   );
 }
 
 export default function Page() {
   return (
-    <main className="space-y-10">
-      <section className="rounded-3xl border border-neutral-200 bg-white p-6 md:p-10">
-        <SectionTitle
-          title="الأسئلة الشائعة"
-          desc="إجابات مباشرة ومختصرة تساعدك على فهم طريقة العمل قبل تقديم طلبك."
-        />
+    <main className="space-y-8">
+      <section className="r24-surface p-6 md:p-10">
+        <p className="text-sm text-neutral-600">Ready24</p>
+        <h1 className="mt-3 text-3xl font-semibold leading-snug md:text-4xl">
+          الأسئلة الشائعة
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-neutral-700">
+          جمعنا هنا أكثر الأسئلة تكراراً بطريقة واضحة ومباشرة. إذا لم تجد إجابتك، راسلنا
+          وسنساعدك سريعاً.
+        </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <ButtonLink href="/order" variant="solid" size="lg">
-            قدّم طلباً الآن
-          </ButtonLink>
-          <ButtonLink href="/services" variant="outline" size="lg">
-            استعرض الخدمات
-          </ButtonLink>
-          <ButtonLink href="/pricing" variant="ghost" size="lg">
-            الأسعار
-          </ButtonLink>
-        </div>
-
-        <div className="mt-4 text-sm text-neutral-600">
-          إذا لم تجد إجابة لسؤالك هنا، اكتب لنا وسنرد عليك بسرعة وبوضوح.
+          <Link
+            href="/order"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-neutral-900 px-5 text-sm font-medium text-white hover:bg-neutral-800"
+          >
+            ابدأ الطلب الآن
+          </Link>
+          <Link
+            href="/services"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            تصفح الخدمات
+          </Link>
+          <Link
+            href="/pricing"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            اطلع على الأسعار
+          </Link>
         </div>
       </section>
 
       <section className="grid gap-4">
         {FAQ.map((item, idx) => (
-          <Card key={idx} className="p-0">
-            <details className="group rounded-3xl p-5">
-              <summary className="cursor-pointer list-none select-none">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="text-base font-semibold leading-snug">{item.q}</div>
-                  <div className="mt-0.5 shrink-0 text-neutral-500 transition-transform group-open:rotate-180">
-                    ▼
-                  </div>
-                </div>
-              </summary>
-              <div className="mt-3 text-sm leading-relaxed text-neutral-700">
-                {item.a}
-              </div>
-            </details>
-          </Card>
+          <FaqItemCard key={item.q} item={item} defaultOpen={idx === 0} />
         ))}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <Card className="p-5">
-          <p className="text-sm font-semibold">قبل أن تطلب</p>
-          <p className="mt-2 text-sm text-neutral-700">
-            جهّز المدخلات الأساسية: الهدف، الملف الحالي إن وجد، وأي ملاحظات خاصة.
-          </p>
-          <div className="mt-3 text-sm">
-            <Link href="/order" className="underline underline-offset-4">
-              الذهاب إلى صفحة الطلب
-            </Link>
-          </div>
-        </Card>
+      <section className="r24-surface p-6 md:p-10">
+        <h2 className="text-xl font-semibold">هل لديك سؤال مختلف؟</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-neutral-700">
+          إذا كان سؤالك مرتبطاً بحالة خاصة أو ملف حساس، الأفضل ترسل لنا التفاصيل مباشرة
+          عبر صفحة التواصل، وسنرد عليك بما يناسب وضعك بدون تعقيد.
+        </p>
 
-        <Card className="p-5">
-          <p className="text-sm font-semibold">السياسات</p>
-          <p className="mt-2 text-sm text-neutral-700">
-            الاطلاع على سياسات الدفع والتسليم والخصوصية يساعد على وضوح التوقعات من
-            البداية.
-          </p>
-          <div className="mt-3 text-sm">
-            <Link href="/policies" className="underline underline-offset-4">
-              قراءة السياسات
-            </Link>
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <p className="text-sm font-semibold">تواصل سريع</p>
-          <p className="mt-2 text-sm text-neutral-700">
-            إذا كان لديك سؤال محدد أو طلب عاجل، تواصل معنا مباشرة وسنرتب الخطوات معك.
-          </p>
-          <div className="mt-3 text-sm">
-            <Link href="/contact" className="underline underline-offset-4">
-              فتح صفحة التواصل
-            </Link>
-          </div>
-        </Card>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link
+            href="/contact"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            تواصل معنا
+          </Link>
+          <Link
+            href="/policies"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            اقرأ السياسات
+          </Link>
+          <Link
+            href="/ambassadors"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            برنامج السفراء
+          </Link>
+        </div>
       </section>
     </main>
   );
