@@ -12,7 +12,7 @@ export default function HomePage() {
       <section className="rounded-3xl border border-neutral-200 bg-white p-6 md:p-10">
         <p className="text-sm text-neutral-600">Opportunity | Organized | Fast</p>
         <h1 className="mt-3 text-3xl font-semibold leading-snug md:text-4xl">
-          Ready24 خدمات احترافية سريعة بدون لخبطة
+          Ready24 خدمات احترافية سريعة من دون تعقيد
         </h1>
         <p className="mt-4 max-w-2xl text-base text-neutral-700">
           بنجهّز ليك مستندات، محتوى، وترتيب شغل بطريقة منظمة وواضحة وتسليم سريع حسب

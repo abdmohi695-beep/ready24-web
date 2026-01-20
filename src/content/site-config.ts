@@ -29,7 +29,7 @@ const RAW_SITE_CONFIG: SiteConfigEntry[] = [
 
   {
     key: "default_seo_title_ar",
-    value: "Ready24  خدمات احترافية سريعة بدون لخبطة",
+    value: "Ready24  خدمات احترافية سريعة من دون تعقيد",
     notes_ar: "عنوان SEO افتراضي",
   },
   {

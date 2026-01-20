@@ -7,7 +7,7 @@
 const RAW_SEO_ENTRIES: SeoEntry[] = [
   {
     path: "/",
-    title_ar: "Ready24  خدمات احترافية سريعة بدون لخبطة",
+    title_ar: "Ready24  خدمات احترافية سريعة من دون تعقيد",
     description_ar:
       "بنجهّز ليك مستندات، محتوى، وترتيب شغل بطريقة منظمة وواضحة  وتسليم سريع حسب الخدمة.",
     canonical: "/",
@@ -43,7 +43,7 @@ const RAW_SEO_ENTRIES: SeoEntry[] = [
   {
     path: "/how-we-work",
     title_ar: "كيف نعمل | Ready24",
-    description_ar: "خطوات واضحة من استلام الطلب للمراجعة للتنفيذ للتسليم  بدون لخبطة.",
+    description_ar: "خطوات واضحة من استلام الطلب للمراجعة للتنفيذ للتسليم  من دون تعقيد.",
     canonical: "/how-we-work",
     og_title_ar: "",
     og_description_ar: "",
