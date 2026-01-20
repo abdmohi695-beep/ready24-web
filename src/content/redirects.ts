@@ -1,43 +1,30 @@
-import { CommissionsSchema, type CommissionRule } from "./types";
+import { z } from "zod";
 
 /**
- * Ready24 — Commissions v1 (Day-0)
- * المصدر: Sheet "Commissions_v1" في قالب Day-0.
+ * Ready24  Redirects (Day-0)
+ * المصدر: Sheet "Redirects" في قالب Day-0 Data Pack
  *
- * ملاحظة مهمة:
- * - هذه البيانات "v1" نهائية للإطلاق حسب قراركم.
- * - أي تعديل بعد الإطلاق يتم بإصدار نسخة جديدة (v2...) وفق آلية ضبط التغيير.
- *
- * commission_type:
- * - percent = نسبة مئوية من قيمة الطلب
- * - fixed   = مبلغ ثابت
- *
- * web_package_code:
- * - يستخدم فقط لو track = web (اختياري حسب تصميم القالب).
+ * ملاحظة:
+ * - نخليها بسيطة ومباشرة، ونقدر نولّد منها public/_redirects لاحقًا.
  */
+const RedirectSchema = z.object({
+  from: z.string().trim().min(1),
+  to: z.string().trim().min(1),
+  status: z.union([z.literal(301), z.literal(302)]).default(301),
+  active: z.enum(["yes", "no"]).default("yes"),
+  notes_ar: z.string().trim().optional().default(""),
+});
 
-const RAW_COMMISSIONS_V1: CommissionRule[] = [
-  // مثال (انسخه وعدّل عليه لاحقًا من القالب):
-  // {
-  //   track: "jobs",
-  //   commission_type: "percent",
-  //   commission_value: 25,
-  //   web_package_code: "",
-  //   notes_ar: "عمولة لأول طلب فقط (حسب سياسة v1).",
-  //   active: "yes",
-  // },
+export type RedirectRule = z.infer<typeof RedirectSchema>;
+const RedirectsSchema = z.array(RedirectSchema);
+
+const RAW_REDIRECTS: RedirectRule[] = [
+  // مثال:
+  // { from: "/home", to: "/", status: 301, active: "yes", notes_ar: "توحيد المسار القديم" },
 ];
 
-export const COMMISSIONS_V1 = CommissionsSchema.parse(RAW_COMMISSIONS_V1);
+export const REDIRECTS = RedirectsSchema.parse(RAW_REDIRECTS);
 
-/* ------------------------------ */
-/* Helpers                         */
-/* ------------------------------ */
-
-export function listActiveCommissionRules(): CommissionRule[] {
-  return COMMISSIONS_V1.filter((r) => r.active === "yes");
-}
-
-export function listCommissionRulesByTrack(track: string): CommissionRule[] {
-  return listActiveCommissionRules().filter((r) => r.track === track);
+export function listActiveRedirects(): RedirectRule[] {
+  return REDIRECTS.filter((r) => r.active === "yes");
 }

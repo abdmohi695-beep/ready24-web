@@ -1,21 +1,18 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
+import { SEO_ENTRIES } from "@/content/seo";
 
-/**
- * sitemap.ts (App Router)
- * لازم يكون فيه default export يرجّع MetadataRoute.Sitemap
- * عشان /sitemap.xml يتولد بدون كسر الـbuild.
- */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "http://localhost:3000";
+  const pages = (SEO_ENTRIES?.length ? SEO_ENTRIES.map((e) => e.path) : ["/"]).map((p) =>
+    p === "" ? "/" : p,
+  );
 
-  // مبدئيًا: نخليها صفحة واحدة (الصفحات الفعلية سنضيفها لاحقًا من SEO Map)
-  return [
-    {
-      url: `${siteUrl}/`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-  ];
+  const uniq = Array.from(new Set(pages));
+
+  return uniq.map((path) => ({
+    url: absoluteUrl(path),
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: path === "/" ? 1 : 0.7,
+  }));
 }

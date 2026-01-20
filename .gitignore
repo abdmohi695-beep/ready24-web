@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 # backups created by scripts (keep them out of git)
 *.bak.*
+
+# Local debug dumps
+ready24_*_dump.txt
+ready24_*_state.txt
+ready24_*_audit.txt
