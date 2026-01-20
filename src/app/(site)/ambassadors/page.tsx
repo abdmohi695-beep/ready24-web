@@ -1,280 +1,151 @@
+// src/app/(site)/resources/page.tsx
 import type { Metadata } from "next";
-import Image from "next/image";
-
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
-import { resolveSeo } from "@/lib/seo";
-import { getSiteConfig } from "@/lib/site";
-
-import { listActiveAmbassadors } from "@/content/ambassadors";
-import {
-  listActiveCommissionRules,
-  listCommissionRulesByTrack,
-} from "@/content/commissions-v1";
-import type { CommissionRule } from "@/content/types";
-
-const seo = resolveSeo("/ambassadors");
+import { buildWhatsappLink } from "@/lib/site";
+import { listPublishedResources, listResourcesByCategory } from "@/content/resources";
+import { listResourceCategoriesSorted } from "@/content/resource-categories";
 
 export const metadata: Metadata = {
-  title: seo.title,
-  description: seo.description,
-  alternates: { canonical: seo.canonicalUrl },
-  robots: seo.robots,
-  openGraph: {
-    title: seo.ogTitle,
-    description: seo.ogDescription,
-    url: seo.canonicalUrl,
-    images: seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: seo.ogTitle,
-    description: seo.ogDescription,
-    images: seo.ogImageUrl ? [seo.ogImageUrl] : undefined,
-  },
+  title: "الموارد | Ready24",
 };
 
-function trackLabel(track: string): string {
-  switch (track) {
-    case "jobs":
-      return "خدمات الوظائف والسير الذاتية";
-    case "students":
-      return "خدمات الطلاب والمذكرات";
-    case "business":
-      return "خدمات الأعمال والمحتوى";
-    case "web":
-      return "خدمات المواقع والحزم";
-    default:
-      return "خدمات أخرى";
-  }
+function parseTags(tags: string) {
+  return (tags || "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 3);
 }
 
-function formatCommission(rule: CommissionRule): string {
-  if (rule.commission_type === "percent") return `${rule.commission_value}%`;
-  return `مبلغ ثابت: ${rule.commission_value}`;
-}
+export default function Page() {
+  const waFallback = "https://wa.me/249115646893";
+  const askLink =
+    buildWhatsappLink(
+      "مرحباً Ready24، أريد مساعدة في اختيار الخدمة المناسبة، وهذه تفاصيل طلبي: ____",
+    ) || waFallback;
 
-function buildWhatsappLink(message?: string): string {
-  const number = getSiteConfig("whatsapp_number", "249115646893")
-    .replace(/[^\d]/g, "")
-    .trim();
-  const base = number ? `https://wa.me/${number}` : "https://wa.me/249115646893";
-  if (!message) return base;
-  return `${base}?text=${encodeURIComponent(message)}`;
-}
-
-export default function AmbassadorsPage() {
-  const ambassadors = listActiveAmbassadors();
-
-  const rulesAll = listActiveCommissionRules();
-  const tracks = Array.from(new Set(rulesAll.map((r) => r.track)));
-
-  const joinMessage =
-    "مرحباً Ready24، أريد الانضمام لبرنامج السفراء. الرجاء تزويدي بالشروط والخطوات.";
+  const resources = listPublishedResources();
+  const categoriesRows = listResourceCategoriesSorted();
+  const categories =
+    categoriesRows.length > 0
+      ? categoriesRows.map((c) => c.category)
+      : Array.from(new Set(resources.map((r) => r.category))).sort((a, b) =>
+          a.localeCompare(b, "ar"),
+        );
 
   return (
-    <main id="main" className="space-y-10">
-      {/* Hero */}
-      <section className="r24-surface overflow-hidden p-6 md:p-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-2xl">
-            <div className="mb-4 flex items-center gap-3">
-              <Image
-                src="/brand/logo-horizontal.png"
-                alt="Ready24"
-                width={260}
-                height={72}
-                priority
-              />
-            </div>
-
-            <h1 className="text-2xl font-semibold leading-snug md:text-3xl">
-              برنامج سفراء Ready24
-            </h1>
-
-            <p className="mt-3 text-base leading-relaxed text-neutral-700">
-              إذا كان لديك شبكة أصدقاء أو طلاب أو زملاء يحتاجون خدمات مرتّبة وسريعة، يمكنك
-              مشاركة كودك. عندما يطلبون عبره، تُسجّل عمولتك وفق القواعد الموضّحة أدناه.
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-3">
-              <ButtonLink href="/order">ابدأ طلباً الآن</ButtonLink>
-              <ButtonLink
-                href={buildWhatsappLink(joinMessage)}
-                target="_blank"
-                rel="noreferrer"
-                variant="outline"
-              >
-                تواصل للانضمام كسفير
-              </ButtonLink>
-            </div>
-          </div>
-
-          <Card className="w-full max-w-md p-5">
-            <h2 className="text-lg font-semibold">مختصر سريع</h2>
-            <ul className="mt-3 space-y-2 text-sm text-neutral-700">
-              <li>• كود واحد لكل سفير.</li>
-              <li>• العمولة تُحسب من قيمة الخدمة المؤكدة بعد اعتماد الطلب.</li>
-              <li>• في خدمات المواقع: قد ترتبط العمولة بحزمة محددة حسب الاتفاق.</li>
-              <li>• أي استثناءات تُوضّح قبل التنفيذ.</li>
-            </ul>
-          </Card>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="grid gap-4 md:grid-cols-3">
-        <Card className="p-5">
-          <h3 className="text-base font-semibold">١) شارك كودك</h3>
-          <p className="mt-2 text-sm text-neutral-700">
-            أرسل كودك لعملائك أو أصدقائك مع رابط الطلب.
-          </p>
-        </Card>
-
-        <Card className="p-5">
-          <h3 className="text-base font-semibold">٢) نؤكد الطلب</h3>
-          <p className="mt-2 text-sm text-neutral-700">
-            الفريق يراجع المدخلات، ويثبت السعر وخطة التنفيذ، ثم يبدأ العمل.
-          </p>
-        </Card>
-
-        <Card className="p-5">
-          <h3 className="text-base font-semibold">٣) تُسجّل عمولتك</h3>
-          <p className="mt-2 text-sm text-neutral-700">
-            بعد اعتماد الطلب، تُثبت العمولة حسب المسار (وظائف/طلاب/أعمال/مواقع).
-          </p>
-        </Card>
-      </section>
-
-      {/* Commission rules */}
+    <main className="space-y-10">
       <section className="space-y-4">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xl font-semibold">قواعد العمولة</h2>
-          <p className="text-sm text-neutral-700">
-            هذه القواعد تُقرأ من ملف المحتوى (Day-0). إذا كان الملف فارغاً الآن، ستظهر
-            الرسالة أدناه.
-          </p>
-        </div>
+        <h1 className="text-3xl font-semibold">الموارد</h1>
+        <p className="max-w-3xl text-sm leading-7 text-neutral-700">
+          روابط مختارة تساعدك في التقديم، التعلم، وبناء ملف مهني قوي. نحن نضيفها تدريجياً،
+          ونفضّل دائماً المصادر الواضحة والموثوقة.
+        </p>
 
-        {rulesAll.length === 0 ? (
-          <Card className="p-5">
-            <p className="text-sm text-neutral-700">
-              لا توجد قواعد عمولة منشورة حالياً. أضفها من ملف{" "}
-              <span className="font-medium">src/content/commissions-v1.ts</span> ثم أعد
-              البناء.
-            </p>
-          </Card>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {tracks.map((track) => {
-              const rules = listCommissionRulesByTrack(track);
-              return (
-                <Card key={track} className="p-5">
-                  <h3 className="text-base font-semibold">{trackLabel(track)}</h3>
-                  <ul className="mt-3 space-y-2 text-sm text-neutral-700">
-                    {rules.map((r, idx) => (
-                      <li key={`${track}-${idx}`}>
-                        • العمولة:{" "}
-                        <span className="font-medium">{formatCommission(r)}</span>
-                        {r.web_package_code ? (
-                          <span className="mr-2 text-neutral-500">
-                            (مرتبطة بحزمة: {r.web_package_code})
-                          </span>
-                        ) : null}
-                        {r.notes_ar ? (
-                          <div className="mt-1 text-neutral-600">{r.notes_ar}</div>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-3">
+          <ButtonLink href="/services">استعرض الخدمات</ButtonLink>
+          <ButtonLink href={askLink} variant="outline" target="_blank" rel="noreferrer">
+            اسألنا عبر واتساب
+          </ButtonLink>
+        </div>
       </section>
 
-      {/* Ambassadors list */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold">السفراء الحاليون</h2>
-          <p className="mt-1 text-sm text-neutral-700">
-            قائمة السفراء تُدار من ملف المحتوى. يمكنك إضافتهم لاحقاً وستظهر هنا تلقائياً.
+      {resources.length === 0 ? (
+        <Card className="p-6">
+          <div className="text-base font-semibold">الموارد قيد التحديث</div>
+          <p className="mt-2 text-sm leading-7 text-neutral-700">
+            لم نضف موارد منشورة بعد. يمكنك الآن طلب الخدمة المناسبة وسنرشدك لما تحتاجه من
+            روابط وخطوات حسب حالتك.
           </p>
-        </div>
-
-        {ambassadors.length === 0 ? (
-          <Card className="p-5">
-            <p className="text-sm text-neutral-700">
-              لا توجد بيانات سفراء منشورة حالياً. أضفهم داخل{" "}
-              <span className="font-medium">src/content/ambassadors.ts</span>.
-            </p>
-          </Card>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {ambassadors.map((a) => {
-              const wa = a.whatsapp
-                ? `https://wa.me/${String(a.whatsapp).replace(/[^\d]/g, "")}`
-                : "";
-              return (
-                <Card key={a.code} className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="text-base font-semibold">{a.name_ar}</div>
-                      <div className="mt-1 text-sm text-neutral-700">
-                        كود السفير:{" "}
-                        <span className="font-mono font-semibold">{a.code}</span>
-                      </div>
-                      {a.tags_ar ? (
-                        <div className="mt-2 text-sm text-neutral-600">{a.tags_ar}</div>
-                      ) : null}
-                    </div>
-
-                    {wa ? (
-                      <a
-                        href={wa}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded-xl border border-neutral-200 px-3 py-2 text-sm font-medium hover:bg-neutral-50"
-                      >
-                        واتساب
-                      </a>
-                    ) : null}
-                  </div>
-
-                  {a.notes_ar ? (
-                    <div className="mt-3 text-sm text-neutral-700">{a.notes_ar}</div>
-                  ) : null}
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* CTA */}
-      <section className="r24-surface p-6 md:p-8">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold">جاهز تبدأ؟</h2>
-            <p className="mt-1 text-sm text-neutral-700">
-              ابدأ بطلب بسيط الآن، أو تواصل معنا لتفعيل كود سفير لك ومشاركة القواعد كاملة.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <ButtonLink href="/order">طلب خدمة</ButtonLink>
-            <ButtonLink
-              href={buildWhatsappLink(joinMessage)}
-              target="_blank"
-              rel="noreferrer"
-              variant="outline"
-            >
-              تواصل واتساب
+          <div className="mt-4 flex flex-wrap gap-3">
+            <ButtonLink href="/order">ابدأ طلباً الآن</ButtonLink>
+            <ButtonLink href={askLink} variant="outline" target="_blank" rel="noreferrer">
+              واتساب Ready24
             </ButtonLink>
           </div>
-        </div>
-      </section>
+        </Card>
+      ) : (
+        <section className="space-y-8">
+          {categories.map((cat) => {
+            const items =
+              categoriesRows.length > 0
+                ? listResourcesByCategory(cat)
+                : resources.filter((r) => r.category === cat);
+
+            if (items.length === 0) return null;
+
+            const catNotes =
+              categoriesRows.find((c) => c.category === cat)?.notes_ar?.trim() || "";
+
+            return (
+              <div key={cat} className="space-y-3">
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-semibold">{cat}</h2>
+                    {catNotes ? (
+                      <p className="mt-1 text-sm text-neutral-600">{catNotes}</p>
+                    ) : null}
+                  </div>
+                  <div className="text-sm text-neutral-600">{items.length} مورد</div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  {items.map((r) => {
+                    const tags = parseTags(r.tags);
+                    const related = (r.related_service_slug || "").trim();
+                    const relatedHref = related ? `/services#${related}` : "";
+
+                    return (
+                      <Card key={r.id} className="p-6">
+                        <div className="space-y-2">
+                          <div className="text-lg font-semibold">{r.ar_name}</div>
+                          {r.ar_summary ? (
+                            <p className="text-sm leading-7 text-neutral-700">
+                              {r.ar_summary}
+                            </p>
+                          ) : null}
+
+                          {tags.length > 0 ? (
+                            <div className="flex flex-wrap gap-2 pt-1">
+                              {tags.map((t) => (
+                                <span
+                                  key={`${r.id}-${t}`}
+                                  className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs text-neutral-700"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+
+                          {r.risk_note_ar ? (
+                            <p className="pt-2 text-xs leading-6 text-neutral-600">
+                              تنبيه: {r.risk_note_ar}
+                            </p>
+                          ) : null}
+
+                          <div className="pt-4 flex flex-wrap gap-3">
+                            <ButtonLink href={r.url} target="_blank" rel="noreferrer">
+                              فتح الرابط
+                            </ButtonLink>
+
+                            {relatedHref ? (
+                              <ButtonLink href={relatedHref} variant="outline">
+                                خدمة مرتبطة
+                              </ButtonLink>
+                            ) : null}
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </section>
+      )}
     </main>
   );
 }
