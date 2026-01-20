@@ -1,4 +1,4 @@
-﻿import { SeoEntriesSchema, type SeoEntry } from "./types";
+import { SeoEntriesSchema, type SeoEntry } from "./types";
 
 /**
  * Ready24  SEO Map (Day-0)

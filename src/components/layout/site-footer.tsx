@@ -1,4 +1,4 @@
-﻿export default function SiteFooter() {
+export default function SiteFooter() {
   return (
     <footer className="border-t border-neutral-200">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-3">

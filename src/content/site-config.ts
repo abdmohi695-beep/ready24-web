@@ -1,4 +1,4 @@
-﻿import { SiteConfigSchema, type SiteConfigEntry } from "./types";
+import { SiteConfigSchema, type SiteConfigEntry } from "./types";
 
 /**
  * Ready24  Site Config (Day-0)

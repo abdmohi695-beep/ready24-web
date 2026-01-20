@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
