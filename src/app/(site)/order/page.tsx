@@ -1,149 +1,160 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { buildWhatsappLink, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "طلب خدمة | Ready24",
+  description:
+    "ابدأ طلبك بسرعة وبمعلومات مرتبة. سنراجع طلبك ونؤكد السعر وخطة التنفيذ قبل أن نبدأ.",
 };
 
-const WHATSAPP_NUMBER = "249115646893";
-
-function waLink(text: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-}
+const MESSAGE_TEMPLATE =
+  "مرحباً Ready24، أرغب في طلب خدمة.\n\n" +
+  "١) الاسم:\n" +
+  "٢) الخدمة المطلوبة:\n" +
+  "٣) الهدف من الخدمة:\n" +
+  "٤) الموعد النهائي للتسليم:\n" +
+  "٥) الروابط/الملفات المتاحة الآن:\n" +
+  "٦) ملاحظات إضافية (إن وجدت):\n\n" +
+  "شكراً.";
 
 export default function Page() {
-  const msg =
-    "مرحبا Ready24 أريد طلب خدمة. " +
-    "الخدمة المطلوبة: (اكتب اسم الخدمة) | " +
-    "اللغة: (عربي/إنجليزي) | " +
-    "الموعد المطلوب: (Express/Short/Medium/Large) | " +
-    "ملاحظات مختصرة: (اكتب هنا)";
+  const waLink = buildWhatsappLink(MESSAGE_TEMPLATE);
 
   return (
     <main className="space-y-8">
       <section className="r24-surface p-6 md:p-10">
-        <p className="text-sm text-neutral-600">Opportunity | Organized | Fast</p>
+        <p className="text-sm text-neutral-600">{SITE.brandNameAr}</p>
+        <h1 className="mt-3 text-3xl font-semibold leading-snug md:text-4xl">طلب خدمة</h1>
 
-        <h1 className="mt-3 text-3xl font-semibold leading-snug md:text-4xl">
-          اطلب خدمتك الآن بخطوات واضحة وتسليم منظم
-        </h1>
-
-        <p className="mt-4 max-w-2xl text-base leading-7 text-neutral-700">
-          عشان نبدأ بسرعة ومن غير لخبطة كل شيء عندنا يمشي على خطوات ثابتة: تحدد الخدمة
-          ترسل الملفات نؤكد السعر والعربون ثم نبدأ التنفيذ ونسلمك نسخة جاهزة للإرسال أو
-          النشر.
+        <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-700">
+          عشان نختصر الزمن ونرد عليك بسرعة، أرسل طلبك بصيغة واضحة ومكتملة. نحن ما بنبدأ
+          التنفيذ قبل ما نؤكد معك <span className="font-semibold">السعر النهائي</span>{" "}
+          وخطة التسليم.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <a
-            href={waLink(msg)}
+            href={waLink || "https://wa.me/"}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-neutral-900 px-5 text-base font-medium text-white hover:bg-neutral-800"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-neutral-900 px-5 text-sm font-medium text-white hover:bg-neutral-800"
           >
-            ابدأ الطلب عبر واتساب
+            إرسال الطلب عبر واتساب
           </a>
 
-          <ButtonLink href="/services" variant="outline" size="lg">
-            اختر الخدمة أولا
-          </ButtonLink>
+          <Link
+            href="/services"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            تصفح الخدمات أولاً
+          </Link>
 
-          <ButtonLink href="/pricing" variant="ghost" size="lg">
-            شوف الأسعار
-          </ButtonLink>
+          <Link
+            href="/pricing"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+          >
+            الاطلاع على الأسعار
+          </Link>
         </div>
 
-        <p className="mt-4 text-sm text-neutral-600">
-          ملاحظة: قد نطلب عربونا قبل البدء حسب نوع الخدمة. سنوضح لك كل التفاصيل قبل
-          التنفيذ.
-        </p>
-      </section>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+            <p className="text-sm font-semibold text-neutral-900">كيف نرد عليك؟</p>
+            <p className="mt-2 text-sm leading-7 text-neutral-700">
+              نراجع التفاصيل، نطلب أي نواقص، ثم نؤكد السعر وخطة التنفيذ والتسليم.
+            </p>
+          </div>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <Card className="p-5">
-          <p className="text-sm font-semibold">) اختر الخدمة</p>
-          <p className="mt-2 text-sm leading-6 text-neutral-700">
-            من صفحة الخدمات حتلقى كل خدمة موضحة: الهدف طريقة العمل وزمن التسليم.
-          </p>
-        </Card>
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+            <p className="text-sm font-semibold text-neutral-900">سرعة الاستجابة</p>
+            <p className="mt-2 text-sm leading-7 text-neutral-700">
+              الأسرع: رسالة واحدة مرتبة بدل رسائل متفرقة. كلما كان الطلب واضحاً، كان ردنا
+              أسرع.
+            </p>
+          </div>
 
-        <Card className="p-5">
-          <p className="text-sm font-semibold">) أرسل المحتوى</p>
-          <p className="mt-2 text-sm leading-6 text-neutral-700">
-            أرسل الملفات أو النصوص (Word/PDF/روابط) عبر واتساب. لو في معلومات ناقصة بنسألك
-            مباشرة.
-          </p>
-        </Card>
-
-        <Card className="p-5">
-          <p className="text-sm font-semibold">) تأكيد ثم تنفيذ</p>
-          <p className="mt-2 text-sm leading-6 text-neutral-700">
-            نؤكد السعر والعربون وزمن التسليم ثم نبدأ التنفيذ ونرسل لك نسخة أولى للمراجعة.
-          </p>
-        </Card>
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+            <p className="text-sm font-semibold text-neutral-900">الخصوصية</p>
+            <p className="mt-2 text-sm leading-7 text-neutral-700">
+              ما بننشر أي تفاصيل أو نماذج من شغلك بدون إذن واضح منك.
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold">شنو نحتاج منك</h2>
-          <ul className="mt-4 space-y-2 text-sm text-neutral-700">
-            <li>
-              <span className="font-semibold">السير الذاتية:</span> السيرة الحالية +
-              الوظيفة المستهدفة + أي معلومات ناقصة.
-            </li>
-            <li>
-              <span className="font-semibold">خطابات التغطية:</span> رابط الإعلان + اسم
-              الجهة + نقاط قوتك الأساسية.
-            </li>
-            <li>
-              <span className="font-semibold">البروفايل/بورتفوليو:</span> المحتوى الحالي +
-              أمثلة/روابط + الجمهور المستهدف.
-            </li>
-            <li>
-              <span className="font-semibold">المواقع:</span> الهدف + الصفحات المطلوبة +
-              المحتوى/الشعار + أمثلة تعجبك.
-            </li>
-          </ul>
-        </Card>
+        <div className="r24-surface p-6 md:p-8">
+          <h2 className="text-xl font-semibold">نموذج طلب جاهز للنسخ</h2>
+          <p className="mt-2 text-sm leading-7 text-neutral-700">
+            انسخ النص التالي، عبّئ الفراغات، ثم أرسله لنا في واتساب. هذا النموذج يساعدنا
+            نعطيك ردّاً دقيقاً بدون لف ودوران.
+          </p>
 
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold">روابط سريعة تساعدك</h2>
-          <div className="mt-4 grid gap-3 text-sm">
-            <Link
-              className="rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
-              href="/services"
-            >
-              الذهاب إلى الخدمات
-            </Link>
-            <Link
-              className="rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
-              href="/pricing"
-            >
-              الاطلاع على الأسعار
-            </Link>
-            <Link
-              className="rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
-              href="/how-we-work"
-            >
-              كيف نعمل وزمن التسليم
-            </Link>
+          <pre className="mt-4 whitespace-pre-wrap rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-sm leading-7 text-neutral-800">
+            {MESSAGE_TEMPLATE}
+          </pre>
+
+          <div className="mt-5 flex flex-wrap gap-3">
             <a
-              className="rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
-              href={waLink(msg)}
+              href={waLink || "https://wa.me/"}
               target="_blank"
               rel="noreferrer"
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-neutral-900 px-5 text-sm font-medium text-white hover:bg-neutral-800"
             >
-              فتح واتساب برسالة جاهزة
+              فتح واتساب مع النموذج
             </a>
-          </div>
 
-          <p className="mt-4 text-xs text-neutral-500">
-            ساعات العمل: الأحد إلى الخميس (: مساء : مساء بتوقيت السودان). مغلق الجمعة
-            والسبت والإجازات الرسمية.
-          </p>
-        </Card>
+            <Link
+              href="/policies"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+            >
+              الاطلاع على السياسات
+            </Link>
+          </div>
+        </div>
+
+        <div className="r24-surface p-6 md:p-8">
+          <h2 className="text-xl font-semibold">قبل الإرسال: ٥ نقاط تختصر الزمن</h2>
+          <ul className="mt-4 space-y-3 text-sm leading-7 text-neutral-700">
+            <li className="rounded-2xl border border-neutral-200 bg-white p-4">
+              <span className="font-semibold text-neutral-900">الخدمة بدقة:</span> اختر
+              الاسم الأقرب من صفحة الخدمات.
+            </li>
+            <li className="rounded-2xl border border-neutral-200 bg-white p-4">
+              <span className="font-semibold text-neutral-900">الهدف:</span> ماذا تريد أن
+              تحقق من الخدمة؟ (وظيفة، منحة، بروفايل، موقع…)
+            </li>
+            <li className="rounded-2xl border border-neutral-200 bg-white p-4">
+              <span className="font-semibold text-neutral-900">الموعد النهائي:</span>{" "}
+              تاريخ/وقت التسليم المطلوب.
+            </li>
+            <li className="rounded-2xl border border-neutral-200 bg-white p-4">
+              <span className="font-semibold text-neutral-900">الملفات أو الروابط:</span>{" "}
+              أرسل رابط Google Drive/Dropbox أو أي ملف متاح الآن.
+            </li>
+            <li className="rounded-2xl border border-neutral-200 bg-white p-4">
+              <span className="font-semibold text-neutral-900">تفضيل الأسلوب:</span> عربية
+              فصحى، أو عربية بسيطة، أو مزيج عربي/إنجليزي حسب الحاجة.
+            </li>
+          </ul>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/how-we-work"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+            >
+              كيف نعمل؟
+            </Link>
+
+            <Link
+              href="/contact"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-medium hover:bg-neutral-50"
+            >
+              طرق التواصل
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );
