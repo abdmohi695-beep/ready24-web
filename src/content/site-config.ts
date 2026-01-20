@@ -41,7 +41,7 @@ const RAW_SITE_CONFIG: SiteConfigEntry[] = [
 
   {
     key: "default_og_image_path",
-    value: "/brand/og-default.webp",
+    value: "/brand/og-default.png",
     notes_ar: "صورة OG افتراضية",
   },
 ];
