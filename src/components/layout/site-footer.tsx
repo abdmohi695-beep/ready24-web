@@ -1,59 +1,77 @@
-export default function SiteFooter() {
+import Image from "next/image";
+import Link from "next/link";
+import { Facebook, Linkedin, MessageCircle } from "lucide-react";
+
+const LINKS = [
+  { href: "https://wa.me/249115646893", label: "واتساب", icon: MessageCircle },
+  { href: "https://web.facebook.com/ready24platform", label: "فيسبوك", icon: Facebook },
+  {
+    href: "https://www.linkedin.com/company/ready24platform/",
+    label: "لينكدإن",
+    icon: Linkedin,
+  },
+];
+
+export function SiteFooter() {
   return (
-    <footer className="border-t border-neutral-200">
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-3">
-        <div>
-          <p className="text-sm font-semibold text-neutral-900">Ready24</p>
-          <p className="mt-2 text-sm text-neutral-700">
-            خدمات احترافية سريعة منظمة وبسيطة وواضحة.
-          </p>
-          <p className="mt-3 text-xs text-neutral-500">Opportunity | Organized | Fast</p>
+    <footer className="border-t border-[hsl(var(--border))] bg-[hsl(var(--background))]">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="grid gap-8 md:grid-cols-3">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/brand/logo-horizontal.png"
+                alt="Ready24"
+                width={132}
+                height={30}
+              />
+            </div>
+            <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+              خدمات احترافية سريعة، منظمة وبسيطة وواضحة.
+            </p>
+            <p className="text-sm font-semibold text-[hsl(var(--primary))]">
+              Opportunity | Organized | Fast
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-extrabold text-[hsl(var(--primary))]">
+              ساعات العمل
+            </h3>
+            <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+              الأحد إلى الخميس: 1:00 ظهرًا إلى 11:00 مساءً (بتوقيت السودان)
+            </p>
+            <p className="text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+              إجازة: الجمعة والسبت والإجازات الرسمية في السودان
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-extrabold text-[hsl(var(--primary))]">
+              روابط مباشرة
+            </h3>
+            <ul className="space-y-2">
+              {LINKS.map((l) => {
+                const Icon = l.icon;
+                return (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      target="_blank"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-[hsl(var(--foreground))] opacity-80 hover:opacity-100 hover:underline hover:underline-offset-4"
+                    >
+                      <Icon className="h-4 w-4" />
+                      {l.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
-        <div>
-          <p className="text-sm font-semibold text-neutral-900">ساعات العمل</p>
-          <p className="mt-2 text-sm text-neutral-700">
-            الأحد إلى الخميس: : ظهرًا : مساءً (بتوقيت السودان)
-          </p>
-          <p className="mt-2 text-sm text-neutral-700">
-            مغلق: الجمعة والسبت والإجازات الرسمية في السودان
-          </p>
-        </div>
-
-        <div>
-          <p className="text-sm font-semibold text-neutral-900">روابط مباشرة</p>
-          <ul className="mt-2 space-y-2 text-sm">
-            <li>
-              <a
-                className="text-neutral-700 hover:text-neutral-950"
-                href="https://wa.me/249115646893"
-                target="_blank"
-                rel="noreferrer"
-              >
-                واتساب Ready24
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-neutral-700 hover:text-neutral-950"
-                href="https://web.facebook.com/ready24platform"
-                target="_blank"
-                rel="noreferrer"
-              >
-                فيسبوك
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-neutral-700 hover:text-neutral-950"
-                href="https://www.linkedin.com/company/ready24platform/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                لينكدإن
-              </a>
-            </li>
-          </ul>
+        <div className="mt-8 border-t border-[hsl(var(--border))] pt-6 text-xs text-[hsl(var(--muted-foreground))]">
+          {new Date().getFullYear()} Ready24
         </div>
       </div>
     </footer>
